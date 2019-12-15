@@ -1,5 +1,6 @@
 #include "mbed.h"
 #include "i2cThread.h"
+#include "calculationThread.h"
 
 static const uint8 SENSOR_ADDRESS = 0x56 << 1; // 8-bit I2C address
 static const uint8 REG_COE = 0xA0; // COE register address
@@ -37,11 +38,7 @@ void i2cTask(void) {
         cmd[0] = REG_COE;
         i2c.write(SENSOR_ADDRESS, cmd, 1);
         i2c.read(SENSOR_ADDRESS, coe, REG_COE_LENGTH);
-        printf("COE=");
-        for (uint32 i = 0; i < REG_COE_LENGTH; i++) {
-            printf("%02X ", coe[i]);
-        }
-        printf("\n");
+        setSensorCoe(coe);
     }
     for (;;) {
         osEvent event = queue.get();
@@ -62,11 +59,7 @@ void i2cTask(void) {
                         cmd[0] = REG_TXD;
                         i2c.write(SENSOR_ADDRESS, cmd, 2);
                         i2c.read(SENSOR_ADDRESS, txd, REG_TXD_LENGTH);
-                        printf("RAW=");
-                        for (uint32 i = 0; i < REG_TXD_LENGTH; i++) {
-                            printf("%02X ", txd[i]);
-                        }
-                        printf("\n");
+                        setSensorRawData(txd);
                     }
                     break;
             }
