@@ -1,9 +1,11 @@
 #include "mbed.h"
 #include "ledThread.h"
 #include "i2cThread.h"
+#include "calculationThread.h"
 
 Thread ledThread;
 Thread i2cThread;
+Thread calculationThread;
 
 // main() runs in its own thread in the OS
 int main() {
@@ -11,6 +13,7 @@ int main() {
 
     ledThread.start(ledTask);
     i2cThread.start(i2cTask);
+    calculationThread.start(calculationTask);
     for (;;) {
         sensorMeasure();
         setLedRed(true);
