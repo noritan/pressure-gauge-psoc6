@@ -1,13 +1,16 @@
 #include "mbed.h"
 #include "ledThread.h"
+#include "i2cThread.h"
 
 Thread ledThread;
+Thread i2cThread;
 
 // main() runs in its own thread in the OS
 int main() {
     printf("Started.\n");
 
     ledThread.start(ledTask);
+    i2cThread.start(i2cTask);
     for (;;) {
         setLedRed(true);
         ThisThread::sleep_for(100);
