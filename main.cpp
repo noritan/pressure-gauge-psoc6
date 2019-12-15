@@ -12,6 +12,7 @@ int main() {
     ledThread.start(ledTask);
     i2cThread.start(i2cTask);
     for (;;) {
+        sensorMeasure();
         setLedRed(true);
         ThisThread::sleep_for(100);
         setLedRed(false);
