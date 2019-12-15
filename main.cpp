@@ -3,6 +3,9 @@
 #include "i2cThread.h"
 #include "calculationThread.h"
 
+static const int32 SEND_PERIOD = 10;
+static int32 measureCount = 0;
+
 Thread ledThread;
 Thread i2cThread;
 Thread calculationThread;
@@ -15,19 +18,15 @@ int main() {
     i2cThread.start(i2cTask);
     calculationThread.start(calculationTask);
     for (;;) {
+        if (--measureCount <= 0) {
+            setSendRequest();
+            measureCount = SEND_PERIOD;
+        }
         sensorMeasure();
         setLedRed(true);
         ThisThread::sleep_for(100);
         setLedRed(false);
-        ThisThread::sleep_for(900);
-        setLedGreen(true);
-        ThisThread::sleep_for(100);
-        setLedGreen(false);
-        ThisThread::sleep_for(900);
-        setLedBlue(true);
-        ThisThread::sleep_for(100);
-        setLedBlue(false);
-        ThisThread::sleep_for(900);
+        ThisThread::sleep_for(2900);
     }
 }
 

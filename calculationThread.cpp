@@ -71,6 +71,12 @@ struct Context {
     double pr;
 } context;
 
+static bool sendRequestFlag = false;
+
+void setSendRequest(void) {
+    sendRequestFlag = true;
+}
+
 static void calculateK(uint8 *coe, double a, double s, double *result) {
     int32 x = (coe[0] << 8) | coe[1];
     if (x & 0x8000) { x -= 0x10000u; } // Sign extend
@@ -134,6 +140,10 @@ void calculationTask(void) {
                         context.pressure = context.pr / 100.0;
                     }
                     printf("T=%.2f P=%.2f\n", context.temperature, context.pressure);
+                    if (sendRequestFlag) {
+                        sendRequestFlag = false;
+                        printf("SEND: T=%.2f P=%.2f\n", context.temperature, context.pressure);
+                    }
                     break;
             }
             pool.free(message);
