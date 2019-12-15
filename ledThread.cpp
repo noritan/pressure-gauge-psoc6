@@ -1,9 +1,9 @@
 #include "mbed.h"
 #include "ledThread.h"
 
-mbed::DigitalOut led_r(LED1/*P0_3*/, 1);
-mbed::DigitalOut led_g(LED3/*P1_1*/, 1);
-mbed::DigitalOut led_b(LED2/*P11_1*/, 1);
+static DigitalOut led_r(LED1/*P0_3*/, 1);
+static DigitalOut led_g(LED3/*P1_1*/, 1);
+static DigitalOut led_b(LED2/*P11_1*/, 1);
 
 enum Opcode {
     OP_setRed,
@@ -16,8 +16,8 @@ struct Message {
     uint32 operand;
 };
 
-Queue<Message, 32> queue;
-MemoryPool<Message, 16> pool;
+static Queue<Message, 32> queue;
+static MemoryPool<Message, 16> pool;
 
 void setLedRed(bool value) {
     Message *message = pool.alloc();
