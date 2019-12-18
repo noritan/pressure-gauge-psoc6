@@ -1,5 +1,6 @@
 #include "mbed.h"
 #include "calculationThread.h"
+#include "wifiThread.h"
 
 enum Opcode {
     OP_setCoe,
@@ -142,7 +143,8 @@ void calculationTask(void) {
                     printf("T=%.2f P=%.2f\n", context.temperature, context.pressure);
                     if (sendRequestFlag) {
                         sendRequestFlag = false;
-                        printf("SEND: T=%.2f P=%.2f\n", context.temperature, context.pressure);
+                        sendTemperature(context.temperature);
+                        sendPressure(context.pressure);
                     }
                     break;
             }

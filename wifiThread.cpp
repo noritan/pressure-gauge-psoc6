@@ -66,6 +66,37 @@ const char SSL_CA_PEM[] =  "-----BEGIN CERTIFICATE-----\n"
     "KOqkqm57TH2H3eDJAkSnh6/DNFu0Qg==\n"
     "-----END CERTIFICATE-----\n";
 
+enum Opcode {
+    OP_temperature,
+    OP_pressure
+};
+
+struct Message {
+    enum Opcode opcode;
+    double operand;
+};
+
+static Queue<Message, 32> queue;
+static MemoryPool<Message, 32> pool;
+
+void sendTemperature(double temperature) {
+    Message *message = pool.alloc();
+    if (message) {
+        message->opcode = OP_temperature;
+        message->operand = temperature;
+        queue.put(message);
+    }
+}
+
+void sendPressure(double pressure) {
+    Message *message = pool.alloc();
+    if (message) {
+        message->opcode = OP_pressure;
+        message->operand = pressure;
+        queue.put(message);
+    }
+}
+
 WiFiInterface *wifi = 0;
 
 static void wifiInit(void) {
@@ -81,33 +112,35 @@ static void wifiInit(void) {
     printf("Connected\n");
 }
 
-void dump_response(HttpResponse* res) {
-    printf("Status: %d - %s\n", res->get_status_code(), res->get_status_message().c_str());
- 
-    printf("Headers:\n");
-    for (size_t ix = 0; ix < res->get_headers_length(); ix++) {
-        printf("\t%s: %s\n", res->get_headers_fields()[ix]->c_str(), res->get_headers_values()[ix]->c_str());
+void sendData(Message *message, char *suffix) {
+    char url[128];
+    sprintf(url, "%s?ID=%s_%s&PRESSURE=%f", SERVER_CGI, SENSOR_ID, suffix, message->operand);
+    HttpsRequest* request = new HttpsRequest(wifi, SSL_CA_PEM, HTTP_GET, url);
+    HttpResponse* response = request->send();
+    if (response) {
+        printf("SENT: T=%.2f\n", message->operand);
+    } else {
+        printf("HttpRequest failed (error code %d)\n", request->get_error());
     }
-    printf("\nBody (%ud bytes):\n\n%s\n", res->get_body_length(), res->get_body_as_string().c_str());
+    delete request;
 }
 
 void wifiTask(void) {
     wifiInit();
 
     for (;;) {
-        ThisThread::sleep_for(30000);
-        char url[128];
-        sprintf(url, "%s?ID=%s&PRESSURE=%.2f", SERVER_CGI, SENSOR_ID, 999.99);
-        HttpsRequest* get_req = new HttpsRequest(wifi, SSL_CA_PEM, HTTP_GET, url);
- 
-        HttpResponse* get_res = get_req->send();
-        if (get_res) {
-            printf("\n----- HTTPS GET response -----\n");
-            dump_response(get_res);
-        } else {
-            printf("HttpRequest failed (error code %d)\n", get_req->get_error());
+        osEvent event = queue.get();
+        if (event.status == osEventMessage) {
+            Message *message = (Message *)event.value.p;
+            switch (message->opcode) {
+                case OP_temperature:
+                    sendData(message, "T");
+                    break;
+                case OP_pressure: 
+                    sendData(message, "P");
+                    break;
+            }
+            pool.free(message);
         }
-        delete get_req;
-
     }
 }
