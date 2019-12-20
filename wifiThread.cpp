@@ -118,7 +118,7 @@ void sendData(Message *message, string suffix) {
     HttpsRequest* request = new HttpsRequest(wifi, SSL_CA_PEM, HTTP_GET, url);
     HttpResponse* response = request->send();
     if (response) {
-        printf("SENT: T=%.2f\n", message->operand);
+        printf("SENT: %s=%.2f\n", suffix.c_str(), message->operand);
     } else {
         printf("HttpRequest failed (error code %d)\n", request->get_error());
     }
