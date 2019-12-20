@@ -112,9 +112,9 @@ static void wifiInit(void) {
     printf("Connected\n");
 }
 
-void sendData(Message *message, char *suffix) {
+void sendData(Message *message, string suffix) {
     char url[128];
-    sprintf(url, "%s?ID=%s_%s&PRESSURE=%f", SERVER_CGI, SENSOR_ID, suffix, message->operand);
+    sprintf(url, "%s?ID=%s_%s&PRESSURE=%f", SERVER_CGI, SENSOR_ID, suffix.c_str(), message->operand);
     HttpsRequest* request = new HttpsRequest(wifi, SSL_CA_PEM, HTTP_GET, url);
     HttpResponse* response = request->send();
     if (response) {
