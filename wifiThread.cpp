@@ -8,7 +8,8 @@
  *
  *     WIFI_SSID: SSID name of WiFi access point.
  *     WIFI_PASSWORD: Password of the access point.
- *     SERVER_CGI: URL to the CGI getting the HTTPS packet.
+ *     SERVER_DOMAIN: Domain name of the database server.
+ *     SERVER_CGI: Path to the CGI to GET a request.
  *     SENSOR_ID: ID name of the measured sensor.
  */
 #include "secret.h"
@@ -100,9 +101,10 @@ void sendPressure(double pressure) {
 WiFiInterface *wifi = 0;
 
 static void wifiInit(void) {
+    nsapi_error_t errorCode;
+
     wifi = WiFiInterface::get_default_instance();
     printf("Connecting: %08X\n", (uint32)wifi);
-    ThisThread::sleep_for(1000);
     for (;;) {
         nsapi_error_t errorCode = wifi->connect(WIFI_SSID, WIFI_PASSWORD, NSAPI_SECURITY_WPA_WPA2);
         if (errorCode == NSAPI_ERROR_OK) break;
@@ -114,7 +116,8 @@ static void wifiInit(void) {
 
 void sendData(Message *message, string suffix) {
     char url[128];
-    sprintf(url, "%s?ID=%s_%s&PRESSURE=%f", SERVER_CGI, SENSOR_ID, suffix.c_str(), message->operand);
+    sprintf(url, "https://%s/%s?ID=%s_%s&PRESSURE=%f",
+        SERVER_DOMAIN, SERVER_CGI, SENSOR_ID, suffix.c_str(), message->operand);
     HttpsRequest* request = new HttpsRequest(wifi, SSL_CA_PEM, HTTP_GET, url);
     HttpResponse* response = request->send();
     if (response) {
