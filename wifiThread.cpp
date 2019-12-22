@@ -106,7 +106,7 @@ static void wifiInit(void) {
     wifi = WiFiInterface::get_default_instance();
     printf("Connecting: %08X\n", (uint32)wifi);
     for (;;) {
-        nsapi_error_t errorCode = wifi->connect(WIFI_SSID, WIFI_PASSWORD, NSAPI_SECURITY_WPA_WPA2);
+        errorCode = wifi->connect(WIFI_SSID, WIFI_PASSWORD, NSAPI_SECURITY_WPA_WPA2);
         if (errorCode == NSAPI_ERROR_OK) break;
         printf("ERROR=%08X\n", errorCode);
         ThisThread::sleep_for(2000); // If for some reason it doesnt work wait 2s and try again
