@@ -19,7 +19,8 @@
  *
  * To add more root certificates, just concatenate them.
  */
-const char SSL_CA_PEM[] =  "-----BEGIN CERTIFICATE-----\n"
+const char SSL_CA_PEM[] =
+    "-----BEGIN CERTIFICATE-----\n"
     "MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n"
     "ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\n"
     "b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL\n"
@@ -65,7 +66,8 @@ const char SSL_CA_PEM[] =  "-----BEGIN CERTIFICATE-----\n"
     "X4Po1QYz+3dszkDqMp4fklxBwXRsW10KXzPMTZ+sOPAveyxindmjkW8lGy+QsRlG\n"
     "PfZ+G6Z6h7mjem0Y+iWlkYcV4PIWL1iwBi8saCbGS5jN2p8M+X+Q7UNKEkROb3N6\n"
     "KOqkqm57TH2H3eDJAkSnh6/DNFu0Qg==\n"
-    "-----END CERTIFICATE-----\n";
+    "-----END CERTIFICATE-----\n"
+    ;
 
 enum Opcode {
     OP_temperature,
